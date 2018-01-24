@@ -3,51 +3,100 @@ const graphqlHTTP = require('express-graphql');
 const { buildSchema } = require('graphql');
 const request = require('request-promise');
 const htmlSoup = require('html-soup');
+const cors = require('cors');
 
-const names = [];
+const people = [];
 
 // construct a schema, using graphql schema language
 const schema = buildSchema(`
+  type Person {
+    name: String
+    email: String
+  }
+
   type Query {
-    peopleName: String
+    person: Person
   }
 `);
 
+class Person {
+  constructor() {
+    this.loadName();
+  }
+
+  loadName() {
+    const self = this;
+    request('http://www.behindthename.com/random/random.php?number=2&gender=m&surname=&all=yes')
+      .then(function (htmlString) {
+        self.processName(htmlString, self);
+        self.loadEmail();
+      })
+      .catch(function (err) {
+        console.log(err);
+      });
+  }
+
+  processName(html, person) {
+    const dom = htmlSoup.parse(html);
+    let randName = '';
+    htmlSoup.select(dom, 'span.heavyhuge > a.plain').forEach(
+      (aa) => {
+        randName += aa.child.text;
+        randName += ' ';
+      }
+    );
+    person.name = randName.substring(0, randName.length -1);
+  }
+
+  loadEmail() {
+    this.email = this.name.replace(' ', '').toLowerCase() + '@fakemail.com'
+  }
+
+/*
+  loadEmail() {
+    const self = this;
+    request('http://www.yopmail.com/en/email-generator.php')
+      .then(function (htmlString) {
+        self.processEmail(htmlString, self);
+      })
+      .catch(function (err) {
+        console.log(err);
+      });
+  }
+
+  processEmail(html, person) {
+    const dom = htmlSoup.parse(html);
+    let randEmail = '';
+    htmlSoup.select(dom, 'input#login').forEach(
+      (inputLogin) => {
+        randEmail = inputLogin.attributes['value'];
+      }
+    );
+    person.email = randEmail;
+  }
+
+*/
+
+}
+
 // the root provides a resolver function for each API endpoint
 const root = {
-  rollThreeDice: () => {
-    return ['s', 'k', 3].map(_ => 1 + Math.floor(Math.random() * 6));
-  },
-  peopleName: () => {
-    loadPeopleNames();
-    return names.shift();
+  person: () => {
+    loadNewPerson(2);
+    return people.shift();
   },
 };
 
-loadPeopleNames = () => {
-  request('http://www.behindthename.com/random/random.php?number=2&gender=m&surname=&all=yes')
-    .then(function (htmlString) {
-      processHTML(htmlString)
-    })
-    .catch(function (err) {
-      console.log(err);
-    });
+loadNewPerson = (number) => {
+  console.log(JSON.stringify(people));
+  while(people.length < number) {
+    people.push(new Person());
+  }
 }
 
-processHTML = (html) => {
-  const dom = htmlSoup.parse(html);
-  let randName = '';
-  htmlSoup.select(dom, 'span.heavyhuge > a.plain').forEach(
-    (aa) => {
-      randName += aa.child.text;
-      randName += ' ';
-    }
-  );
-  names.push(randName.substring(0, randName.length -1));
-}
-
-loadPeopleNames();
+loadNewPerson(2);
 const app = express();
+app.use(cors());
 app.use('/graphql', graphqlHTTP({
   schema: schema,
   rootValue: root,
