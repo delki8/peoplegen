@@ -51,32 +51,6 @@ class Person {
   loadEmail() {
     this.email = this.name.replace(' ', '').toLowerCase() + '@fakemail.com'
   }
-
-/*
-  loadEmail() {
-    const self = this;
-    request('http://www.yopmail.com/en/email-generator.php')
-      .then(function (htmlString) {
-        self.processEmail(htmlString, self);
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
-  }
-
-  processEmail(html, person) {
-    const dom = htmlSoup.parse(html);
-    let randEmail = '';
-    htmlSoup.select(dom, 'input#login').forEach(
-      (inputLogin) => {
-        randEmail = inputLogin.attributes['value'];
-      }
-    );
-    person.email = randEmail;
-  }
-
-*/
-
 }
 
 // the root provides a resolver function for each API endpoint
@@ -88,7 +62,6 @@ const root = {
 };
 
 loadNewPerson = (number) => {
-  console.log(JSON.stringify(people));
   while(people.length < number) {
     people.push(new Person());
   }
