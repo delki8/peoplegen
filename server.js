@@ -8,6 +8,7 @@ const {
 const request = require('request-promise');
 const htmlSoup = require('html-soup');
 const cors = require('cors');
+const { CPF } = require('gerador-validador-cpf');
 
 const people = [];
 
@@ -17,6 +18,7 @@ const personType = new GraphQLObjectType({
   fields: {
     name: { type: GraphQLString },
     email: { type: GraphQLString },
+    cpf: { type: GraphQLString },
   }
 });
 
@@ -38,6 +40,7 @@ const schema = new GraphQLSchema({ query: queryType });
 class Person {
   constructor() {
     this.loadName();
+    this.cpf = CPF.generate();
   }
 
   loadName() {
