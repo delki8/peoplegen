@@ -1,23 +1,39 @@
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
-const { buildSchema } = require('graphql');
+const {
+        GraphQLObjectType,
+        GraphQLString,
+        GraphQLSchema,
+      } = require('graphql');
 const request = require('request-promise');
 const htmlSoup = require('html-soup');
 const cors = require('cors');
 
 const people = [];
 
-// construct a schema, using graphql schema language
-const schema = buildSchema(`
-  type Person {
-    name: String
-    email: String
+// defining the Person type
+const personType = new GraphQLObjectType({
+  name: 'Person',
+  fields: {
+    name: { type: GraphQLString },
+    email: { type: GraphQLString },
   }
+});
 
-  type Query {
-    person: Person
+const queryType = new GraphQLObjectType({
+  name: 'Query',
+  fields: {
+    person: {
+      type: personType,
+      resolve: function () {
+        loadNewPerson(2);
+        return people.shift();
+      }
+    }
   }
-`);
+});
+
+const schema = new GraphQLSchema({ query: queryType });
 
 class Person {
   constructor() {
@@ -53,14 +69,6 @@ class Person {
   }
 }
 
-// the root provides a resolver function for each API endpoint
-const root = {
-  person: () => {
-    loadNewPerson(2);
-    return people.shift();
-  },
-};
-
 loadNewPerson = (number) => {
   while(people.length < number) {
     people.push(new Person());
@@ -68,12 +76,12 @@ loadNewPerson = (number) => {
 }
 
 loadNewPerson(2);
+
 const app = express();
 app.use(cors());
 app.use('/graphql', graphqlHTTP({
   schema: schema,
-  rootValue: root,
   graphiql: true,
 }));
 app.listen('8080');
-console.log('running a graphql api server at localhost:4000/graphql');
+console.log('/graphql running on 8080');
