@@ -86,5 +86,7 @@ app.use('/graphql', graphqlHTTP({
   schema: schema,
   graphiql: true,
 }));
-app.listen('8080');
-console.log('/graphql running on 8080');
+
+const port = process.env.PORT || 8090
+app.listen(port);
+console.log('/graphql running on ' + port);
