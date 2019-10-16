@@ -42,7 +42,7 @@ class Person {
   constructor() {
     this.loadName();
     this.cpf = CPF.generate();
-    this.credits = 'writen by delki8 using behindthename.com';
+    this.credits = 'written by delki8 using behindthename.com';
   }
 
   loadName() {
