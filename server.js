@@ -28,7 +28,7 @@ const queryType = new GraphQLObjectType({
     person: {
       type: personType,
       resolve: function () {
-        loadNewPerson(2);
+        loadNewPerson(5);
         return people.shift();
       }
     }
@@ -78,7 +78,7 @@ loadNewPerson = (number) => {
   }
 }
 
-loadNewPerson(2);
+loadNewPerson(5);
 
 const app = express();
 app.use(cors());
