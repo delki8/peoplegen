@@ -19,6 +19,7 @@ const personType = new GraphQLObjectType({
     name: { type: GraphQLString },
     email: { type: GraphQLString },
     cpf: { type: GraphQLString },
+    credits: { type: GraphQLString },
   }
 });
 
@@ -41,6 +42,7 @@ class Person {
   constructor() {
     this.loadName();
     this.cpf = CPF.generate();
+    this.credits = 'writen by delki8 using behindthename.com';
   }
 
   loadName() {
@@ -58,13 +60,14 @@ class Person {
   processName(html, person) {
     const dom = htmlSoup.parse(html);
     let randName = '';
-    htmlSoup.select(dom, 'span.heavyhuge > a.plain').forEach(
+    htmlSoup.select(dom, 'span.random-result > a.plain').forEach(
       (aa) => {
         randName += aa.child.text;
         randName += ' ';
       }
     );
     person.name = randName.substring(0, randName.length -1);
+    person.name = person.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
 
   loadEmail() {
