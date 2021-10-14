@@ -9,6 +9,7 @@ const request = require('request-promise');
 const htmlSoup = require('html-soup');
 const cors = require('cors');
 const { CPF } = require('gerador-validador-cpf');
+const cnpj = require('@fnando/cnpj/commonjs');
 
 const people = [];
 
@@ -19,6 +20,7 @@ const personType = new GraphQLObjectType({
     name: { type: GraphQLString },
     email: { type: GraphQLString },
     cpf: { type: GraphQLString },
+    cnpj: { type: GraphQLString },    
     credits: { type: GraphQLString },
   }
 });
@@ -42,7 +44,8 @@ class Person {
   constructor() {
     this.loadName();
     this.cpf = CPF.generate();
-    this.credits = 'written by delki8 using behindthename.com';
+    this.cnpj = cnpj.generate(true);
+    this.credits = 'written by delki8 using behindthename.com, github.com/tiagoporto/gerador-validador-cpf and github.com/fnando/cnpj';
   }
 
   loadName() {
