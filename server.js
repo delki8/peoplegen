@@ -60,7 +60,7 @@ class Person {
   processName(html, person) {
     const dom = htmlSoup.parse(html);
     let randName = '';
-    htmlSoup.select(dom, 'span.random-result > a.plain').forEach(
+    htmlSoup.select(dom, 'div.random-results > a.plain').forEach(
       (aa) => {
         randName += aa.child.text;
         randName += ' ';
