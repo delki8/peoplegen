@@ -180,23 +180,18 @@
     // setting up events
     ['name', 'email', 'cpf', 'cnpj'].forEach(text => {
       $(text).onclick = () => {
-        navigator.clipboard.writeText(person[text])
-        $(text).style.color = mainColor;
-        setTimeout(function() {
-          $(text).style = {}
-        }, 250);
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(person[text])
+          $(text).style.color = mainColor;
+          console.log(`${person[text]} to clipboard`);
+          setTimeout(function() {
+            $(text).style = {}
+          }, 250);
+        } else {
+          alert('only available in https');
+        }
       }
     })
-
-    $('email').onclick = () => {
-      navigator.clipboard.writeText(person.email)
-    }
-    $('cpf').onclick = () => {
-      navigator.clipboard.writeText(person.cpf)
-    }
-    $('cnpj').onclick = () => {
-      navigator.clipboard.writeText(person.cnpj)
-    }
   });
 
 
