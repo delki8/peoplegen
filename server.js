@@ -10,6 +10,7 @@ const htmlSoup = require('html-soup');
 const cors = require('cors');
 const { CPF } = require('gerador-validador-cpf');
 const cnpj = require('@fnando/cnpj/commonjs');
+const path = require('path');
 
 const people = [];
 
@@ -20,7 +21,7 @@ const personType = new GraphQLObjectType({
     name: { type: GraphQLString },
     email: { type: GraphQLString },
     cpf: { type: GraphQLString },
-    cnpj: { type: GraphQLString },    
+    cnpj: { type: GraphQLString },
     credits: { type: GraphQLString },
   }
 });
@@ -88,10 +89,16 @@ loadNewPerson(5);
 
 const app = express();
 app.use(cors());
+app.use(express.static('public'));
+
 app.use('/graphql', graphqlHTTP({
   schema: schema,
   graphiql: true,
 }));
+app.use('/', function(req, res) {
+  res.sendFile(path.join(__dirname + '/index.html'));
+});
+
 
 const port = process.env.PORT || 8090
 app.listen(port);
