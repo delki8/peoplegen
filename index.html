@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Major+Mono+Display&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 99%;
+    }
+
+    .container {
+      background-color: #eeeeec;
+      font-family: 'Major Mono Display', monospace;
+      color: #333333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+
+    #personContainer {
+      position: relative;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+      width: 350px;
+      height: 500px;
+      border-radius: 20px;
+      background-color: #fefefc;
+    }
+
+    .header {
+      position: relative;
+    }
+
+    .rounded {
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+    }
+
+    .transitionText:hover {
+      color: #ddd;
+      transition: 0.3s;
+    }
+
+    .headerImage {
+      z-index: 0;
+      width: 100%;
+      min-height: 70%;
+    }
+
+    .shadow {
+      z-index: 1;
+      position: absolute;
+      height: 120px;
+      width: 100%;
+      background-image: linear-gradient(to bottom, rgb(14, 14, 14), rgba(255, 0, 0, 0));
+      top: 0;
+    }
+
+    .content {
+      position: absolute;
+      bottom: 0;
+      padding-bottom: 20px;
+      color: white;
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+      height: 30%;
+      width: 100%;
+      display: flex;
+      /*justify-content: center;*/
+      align-items: center;
+    }
+
+    .name {
+      z-index: 2;
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      font-size: 32px;
+      font-weight: bold;
+      color: #fefefc;
+      width: 90%;
+      cursor: pointer
+    }
+
+    span {
+      font-size: 18px;
+      font-weight: bold;
+      text-align: right;
+      width: 100%;
+      display: inline-block;
+      cursor: pointer
+    }
+
+    #email {
+      text-decoration: underline;
+      font-size: 22px;
+      background-color: black;
+      width: 100%;
+      inline-size: 100%;
+      overflow-wrap: break-word;
+      cursor: pointer;
+    }
+
+    .bottomHeader {
+      z-index: 2;
+      position: absolute;
+      bottom: 0;
+      font-weight: bold;
+      color: #fefefc;
+      padding: 10px 0 15px 0;
+    }
+  </style>
+  <title>PeopleGen</title>
+</head>
+<body>
+
+<div class="container">
+  <div id="personContainer">
+    <div class="header">
+      <img class="rounded headerImage" src="https://picsum.photos/500"/>
+      <div id="name" class="name transitionText"></div>
+      <div class="rounded shadow"></div>
+      <div class="bottomHeader">
+        <span id="cpf" class="transitionText"></span>
+        <span id="cnpj" class="transitionText"></span>
+      </div>
+
+    </div>
+    <div class="content">
+      <div id="email" class="transitionText"></div>
+    </div>
+  </div>
+</div>
+
+<script type="application/javascript">
+  const newPerson = clb => {
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
+    xhr.open('POST', 'https://peoplegen.herokuapp.com/graphql');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('Accept', 'application/json');
+    xhr.onload = () => clb(xhr.response.data.person);
+    const query = `{
+                    person {
+                      name
+                      email
+                      cpf
+                      cnpj
+                      credits
+                    }
+                  }`;
+    xhr.send(JSON.stringify({query}));
+  };
+
+  const $ = (id) => {
+    return document.getElementById(id)
+  }
+
+  const newContent = (id, val) => {
+    $(id).innerHTML = val;
+  }
+
+  newPerson(person => {
+    // fill up the screen
+    newContent('name', person.name);
+    newContent('email', person.email);
+    newContent('cpf', `CPF: ${person.cpf}`);
+    newContent('cnpj', `CNPJ: ${person.cnpj}`);
+
+    // applying random colors
+    let _1 = `${Math.random() * 151}`;
+    let _2 = `${Math.random() * 151}`;
+    let _3 = `${Math.random() * 151}`;
+    const mainColor = `rgb(${_1}, ${_2}, ${_3}, 1)`;
+    $('personContainer').style.backgroundColor = mainColor;
+    document.getElementsByClassName('bottomHeader')[0].style.backgroundColor = `rgb(${_1}, ${_2}, ${_3}, 0.6)`;
+
+    // setting up events
+    ['name', 'email', 'cpf', 'cnpj'].forEach(text => {
+      $(text).onclick = () => {
+        navigator.clipboard.writeText(person[text])
+        $(text).style.color = mainColor;
+        setTimeout(function() {
+          $(text).style = {}
+        }, 250);
+      }
+    })
+
+    $('email').onclick = () => {
+      navigator.clipboard.writeText(person.email)
+    }
+    $('cpf').onclick = () => {
+      navigator.clipboard.writeText(person.cpf)
+    }
+    $('cnpj').onclick = () => {
+      navigator.clipboard.writeText(person.cnpj)
+    }
+  });
+
+
+</script>
+</body>
+</html>
+
+
