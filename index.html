@@ -69,7 +69,6 @@
       height: 30%;
       width: 100%;
       display: flex;
-      /*justify-content: center;*/
       align-items: center;
     }
 
@@ -86,7 +85,7 @@
     }
 
     span {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
       text-align: right;
       width: 100%;
@@ -112,6 +111,15 @@
       color: #fefefc;
       padding: 10px 0 15px 0;
     }
+
+    .anotherBtn {
+      background-color: #333333;
+      color: #fefefc;
+      border-radius: 0;
+      border: 0;
+      font-size: 14px;
+      padding: 8px;
+    }
   </style>
   <title>PeopleGen</title>
 </head>
@@ -133,6 +141,7 @@
       <div id="email" class="transitionText"></div>
     </div>
   </div>
+  <button id="anotherBtn" class="anotherBtn">another</button>
 </div>
 
 <script type="application/javascript">
@@ -163,7 +172,7 @@
     $(id).innerHTML = val;
   }
 
-  newPerson(person => {
+  const personFiller = person => {
     // fill up the screen
     newContent('name', person.name);
     newContent('email', person.email);
@@ -193,8 +202,10 @@
         }
       }
     })
-  });
+  };
+  newPerson(personFiller);
 
+  $('anotherBtn').onclick = () => newPerson(personFiller)
 
 </script>
 </body>
