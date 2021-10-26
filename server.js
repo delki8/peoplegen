@@ -90,6 +90,9 @@ loadNewPerson(5);
 const app = express();
 app.use(cors());
 app.use(express.static('public'));
+app.get('*', function(req, res) {
+  res.redirect('https://' + req.headers.host + req.url)
+})
 
 app.use('/graphql', graphqlHTTP({
   schema: schema,
